@@ -1,8 +1,9 @@
 import { promises as fs } from 'fs'
+import crypto from 'crypto'
 
 export class ProductManager {
     constructor(path) {
-        this.path = path //./products.json
+        this.path = path 
     }
 
     async getProducts() {
@@ -13,17 +14,19 @@ export class ProductManager {
     async getProductById(id) {
         const prods = JSON.parse(await fs.readFile(this.path, 'utf-8'))
         const prod = prods.find(producto => producto.id === id)
-        if (prod)
-            return prod
-        else
-            return 'Producto no existe'
+        return prod
     }
 
     async addProduct(newProduct) {
         const prods = JSON.parse(await fs.readFile(this.path, 'utf-8'))
-        if (newProduct.code && newProduct.id && newProduct.title && newProduct.description && newProduct.price && newProduct.thumbnail && newProduct.code && newProduct.stock) {
+        if (newProduct.code && newProduct.title && newProduct.description && newProduct.price && newProduct.stock) {
             const indice = prods.findIndex(prod => prod.code === newProduct.code)
             if (indice === -1) {
+                newProduct.id = crypto.randomBytes(10).toString('hex')
+                newProduct.status = true
+                if(!newProduct.thumbnail) {
+                    newProduct.thumbnail = []
+                }
                 prods.push(newProduct)
                 await fs.writeFile(this.path, JSON.stringify(prods))
                 return 'Producto creado correctamente'
