@@ -13,13 +13,19 @@ productsRouter.get('/', async (req, res) => {
         const limite = parseInt(limit)
         if (limite || limite > 0) {
             const prodsLimit = prods.slice(0, limite)
-            res.status(200).send(prodsLimit)
+            res.status(200).render('templates/home', {
+                mostrarProductos: true,
+                productos: prodsLimit,
+                css: 'home.css'
+            })
         } else {
             res.status(400).send('Error: Por favor, ingrese un valor numérico válido')
 
         }
     } catch (error) {
-        res.status(500).send(`Error interno del servidor al consultar productos ${error}`)
+        res.status(500).render('templates/error', {
+            error: true,
+        })
     }
 })
 
