@@ -1,0 +1,80 @@
+/* <p class="title">{{this.title}}</p>
+        <p class="price">{{this.price}}</p>
+        <p class="description">{{this.description}}</p>
+        <p class="stock">{{this.stock}}</p>
+*/
+body {
+    background-color: rgb(253, 245, 228);
+    font-family: "Roboto", sans-serif;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+
+.nav,
+.titulo {
+    display: flex;
+    justify-content: center;
+}
+
+.nav {
+    font-weight: 900;
+    font-style: normal;
+}
+
+.titulo {
+    font-weight: 500;
+    font-style: normal;
+}
+
+.display {
+    padding-bottom: 100px;
+    padding: 10px;
+
+}
+
+.sub-display {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.title,
+.price,
+.description,
+.stock,
+.img {
+    display: flex;
+    justify-content: center;
+}
+
+.button {
+    background-color: #00BFA6;
+    padding: 14px 40px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px dashed #00BFA6;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    transition: .4s;
+}
+
+.button:hover {
+    transition: .4s;
+    border: 2px dashed #00BFA6;
+    background-color: #fff;
+    color: #00BFA6;
+}
+
+.button:active {
+    background-color: #87dbd0;
+}
