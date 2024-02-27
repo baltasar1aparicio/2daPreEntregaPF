@@ -11,7 +11,7 @@ productsRouter.get('/', async (req, res) => {
         const { limit } = req.query
         const prods = await productManager.getProducts()
         const limite = parseInt(limit)
-        if (limite || limite > 0) {
+        if (typeof limite !== 'undefined' && !isNaN(limite) && limite > 0) {
             const prodsLimit = prods.slice(0, limite)
             res.status(200).render('templates/home', {
                 mostrarProductos: true,
