@@ -5,26 +5,33 @@ const productsRouter = Router()
 
 productsRouter.get('/', async (req, res) => {
     try {
-        const { limit } = req.query
-        const prods = await productModel.find().lean()
-        const limite = parseInt(limit)
-        if (typeof limite !== 'undefined' && !isNaN(limite) && limite > 0) {
-            const prodsLimit = prods.slice(0, limite)
-            res.status(200).render('templates/home', {
-                mostrarProductos: true,
-                productos: prodsLimit,
-                css: 'home.css'
-            })
-        } else {
-            res.status(400).send('Error: Por favor, ingrese un valor numérico válido')
+        const { limit, page, filter, ord } = req.query;
+        let metFilter;
+        const pag = page !== undefined ? page : 1;
+        const limi = limit !== undefined ? limit : 10;
 
+        if (filter == "true" || filter == "false") {
+            metFilter = "status"
+        } else {
+            if (filter !== undefined)
+                metFilter = "category";
         }
+
+        const query = metFilter != undefined ? { [metFilter]: filter } : {};
+        const ordQuery = ord !== undefined ? { price: ord } : {};
+
+        console.log(query)
+
+        const prods = await productModel.paginate(query, { limit: limi, page: pag, sort: ordQuery });
+        console.log(ordQuery)
+        res.status(200).send(prods)
+
     } catch (error) {
         res.status(500).render('templates/error', {
-            error: true,
-        })
+            error: error,
+        });
     }
-})
+});
 
 productsRouter.get('/:pid', async (req, res) => {
     try {

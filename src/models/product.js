@@ -1,20 +1,11 @@
-/*"title": "Lentejas",
-        "description": "Sanas",
-        "price": 1500,
-        "stock": 25,
-        "code": "L123",
-        "thumbnail": [],
-        "id": "1747ea8e4b47e46934ba",
-        "img": "https://i.ibb.co/ZWs8k22/lentejas300.png"
-*/
-
-
 import { Schema, model } from "mongoose";
+import paginate from 'mongoose-paginate-v2'
 
 const productSchema = new Schema ({
     title: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     description: {
         type: String,
@@ -23,6 +14,14 @@ const productSchema = new Schema ({
     stock: {
         type: Number,
         required: true
+    },
+    category: {
+        type: String,
+        required: true,
+    },
+    status: {
+        type: Boolean,
+        default: true
     },
     code: {
         type: String,
@@ -38,6 +37,7 @@ const productSchema = new Schema ({
     }
 })
 
+productSchema.plugin(paginate)
 const productModel = model("products", productSchema)
 
 export default productModel

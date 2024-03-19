@@ -1,23 +1,21 @@
 import express from 'express'
-import chatRouter from './routes/chat.routes.js'
-import productsRouter from './routes/products.routes.js'
-import cartRouter from './routes/cart.routes.js'
-import userRouter from './routes/user.routes.js'
-import { __dirname } from './path.js'
-import { Server } from 'socket.io'
-import { engine } from 'express-handlebars'
 import mongoose from 'mongoose'
 import messageModel from './models/messages.js'
-import upload from './config/multer.js'
-
+import orderModel from './models/order.js'
+import indexRouter from './routes/index.routes.js'
+import { Server } from 'socket.io'
+import { engine } from 'express-handlebars'
+import { __dirname } from './path.js'
 
 //Configuraciones o declaraciones
 const app = express()
 const PORT = 9000
 
+//Server
 const server = app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)
 })
+
 const io = new Server(server)
 
 //Connection DB
@@ -26,13 +24,72 @@ mongoose.connect("mongodb+srv://baltasar0017:shibuya2018@cluster0.kz1pjdm.mongod
     .catch(e => console.log(e))
 
 
+const resultado = await orderModel.paginate({ status: true }, {limit: 10, page: 1, sort: {price: 'asc'}})
+console.log(resultado)    
+/*
+const resultado = await orderModel.aggregate([
+    {
+        $match: { size: "small" } //filtro
+    },
+    {
+        $group: { _id: "$name", totalQuantity: {$sum: "$quantity"}, totalPrice: {$sum: "$price"} }
+    },
+    {
+        $sort: {totalPrice: -1}
+    },
+    {
+        $group: {_id: 1, orders: {$push: "$$ROOT"}}
+    },
+    {
+        $project: {
+            "_id": 0,
+            orders: "$orders"
+        }
+    },
+    {
+        $merge: {
+            into: "reports"
+        }
+    }
+    
+])
+
+console.log(resultado)
+*/
+
+/*await orderModel.insertMany([
+    { name: "Napolitana", size: "small", price: 8000, quantity: 4 },
+    { name: "4 quesos", size: "small", price: 12000, quantity: 4 },
+    { name: "4 quesos", size: "medium", price: 14000, quantity: 2 },
+    { name: "4 quesos", size: "large", price: 18000, quantity: 2 },
+    { name: "4 quesos", size: "medium", price: 7000, quantity: 1 },
+    { name: "Calabresa", size: "small", price: 5000, quantity: 2 },
+    { name: "Calabresa", size: "medium", price: 8000, quantity: 2 },
+    { name: "Calabresa", size: "large", price: 9000, quantity: 2 },
+    { name: "Calabresa", size: "large", price: 4500, quantity: 1 },
+    { name: "Napolitana", size: "medium", price: 10000, quantity: 2 },
+    { name: "Napolitana", size: "large", price: 14000, quantity: 2 },
+    { name: "Napolitana", size: "small", price: 6000, quantity: 3 },
+    { name: "Vegetariana", size: "small", price: 3000, quantity: 2 },
+    { name: "Vegetariana", size: "medium", price: 6000, quantity: 3 },
+    { name: "Vegetariana", size: "medium", price: 8000, quantity: 4 },
+    { name: "Vegetariana", size: "large", price: 3500, quantity: 1 },
+    { name: "Jamon y morrones", size: "small", price: 5000, quantity: 2 },
+    { name: "Jamon y morrones", size: "large", price: 8000, quantity: 2 },
+    { name: "Jamon y morrones", size: "medium", price: 6000, quantity: 2 },
+    { name: "Jamon y morrones", size: "small", price: 7500, quantity: 3 },
+    { name: "Napolitana", size: "medium", price: 15000, quantity: 3 }
+])*/
 
 //Middlewares
+
 app.use(express.json())
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', __dirname + '/views')
 
+//Routes
+app.use('/', indexRouter)
 
 io.on('connection', (socket) => {
     console.log(`Conexion con Socket.io`)
@@ -58,20 +115,7 @@ io.on('connection', (socket) => {
     res.render('main', { css: cssFile });
 });*/
 
-app.use('/public', express.static(__dirname + '/public'))
-app.use('/api/products', productsRouter, express.static(__dirname + '/public'))
-app.use('/api/cart', cartRouter)
-app.get('/api/chat', chatRouter, express.static(__dirname + '/public'))
-app.post('/upload', upload.single('product'), (req, res) => {
-    try {
-        console.log(req.file)
-        console.log(req.body)
-        res.status(200).send("Imagen cargada correctamente")
-    } catch (e) {
-        res.status(500).send("Error al cargar imagen")
-    }
-})
-app.use('/api/users', userRouter)
+
 
 /*
 app.get('/static', (req, res) => {
