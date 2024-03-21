@@ -122,7 +122,7 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
       );
   
       if (!updatedCart) {
-        return res.status(404).send("Cart or product not found");
+        return res.status(404).send("Carrito o producto no encontrado");
       }
   
       res.status(200).send(updatedCart);
@@ -144,10 +144,10 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
       );
   
       if (!updatedCart) {
-        return res.status(404).send("Cart not found");
+        return res.status(404).send("Carrito no encontrado");
       }
   
-      res.status(200).send("removed!");
+      res.status(200).send("Eliminado!");
     } catch (error) {
       res.status(500).send(`Internal error : ${error}`);
     }
