@@ -17,7 +17,10 @@ cartRouter.get('/:cid', async (req, res) => {
     try {
         const cartId = req.params.cid
         const cart = await cartModel.findOne({ _id: cartId }).populate('products.id_prod')
-        res.status(200).send(cart)
+        if(!cart) {
+          return res.status(404).send("Carrito no encontrado")
+        }
+        res.render('../views/layouts/cart.handlebars', {products: cart.products})
     } catch (error) {
         console.log(error)
         res.status(500).send(`Error interno del servidor al consultar${error}`)
@@ -72,12 +75,12 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
       if (updatedCart) {
         res.status(200).send(updatedCart);
       } else {
-        res.status(404).send("Cart not found");
+        res.status(404).send("Carrito no encontrado");
       }
     } catch (error) {
       res
         .status(500)
-        .send(`internal error when deleting product from cart: ${error}`);
+        .send(`internal error: ${error}`);
     }
   });
 

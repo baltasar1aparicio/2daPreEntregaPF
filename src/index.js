@@ -4,12 +4,17 @@ import messageModel from './models/messages.js'
 import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
 import { Server } from 'socket.io'
+import Handlebars from 'handlebars';
 import { engine } from 'express-handlebars'
 import { __dirname } from './path.js'
+import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access'
+
+
 
 //Configuraciones o declaraciones
 const app = express()
 const PORT = 9000
+
 
 //Server
 const server = app.listen(PORT, () => {
@@ -84,9 +89,17 @@ console.log(resultado)
 //Middlewares
 
 app.use(express.json())
-app.engine('handlebars', engine())
-app.set('view engine', 'handlebars')
-app.set('views', __dirname + '/views')
+app.engine('handlebars', engine({
+    extname: '.handlebars',
+    handlebars: allowInsecurePrototypeAccess(Handlebars),
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+}));
+app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/views');
+
 
 //Routes
 app.use('/', indexRouter)
