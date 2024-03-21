@@ -16,11 +16,11 @@ cartRouter.get('/:cid', async (req, res) => {
 
     try {
         const cartId = req.params.cid
-        const cart = await cartModel.findOne({ _id:cartId }).populate("products.id_prod")
+        const cart = await cartModel.findOne({ _id: cartId }).populate('products.id_prod')
         res.status(200).send(cart)
     } catch (error) {
         console.log(error)
-        res.status(500).send('Error interno del servidor al consultar')
+        res.status(500).send(`Error interno del servidor al consultar${error}`)
     }
 })
 
@@ -57,6 +57,7 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
     }
   });
 
+  //DELETE
   cartRouter.delete("/:cid/products/:pid", async (req, res) => {
     try {
       const cartId = req.params.cid;
@@ -80,13 +81,15 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
     }
   });
 
+  //PUT
+
   cartRouter.put("/:cid", async (req, res) => {
     try {
       const cartId = req.params.cid;
       const newProducts = req.body;
       const updatedCart = await cartModel.findOneAndUpdate(
         { _id: cartId },
-        { $set: { products: newProducts } },
+        { $push: { products: {$each: newProducts} } },
         { new: true }
       );
       if (!updatedCart) {
@@ -97,10 +100,11 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
     } catch (error) {
       res
         .status(500)
-        .send(`internal error when updating products from cart: ${error}`);
+        .send(`Error interno al querer agregar producto: ${error}`);
     }
   });
 
+  //PUT
   cartRouter.put("/:cid/products/:pid", async (req, res) => {
     try {
       const cartId = req.params.cid;
@@ -126,6 +130,8 @@ cartRouter.post("/:cid/:pid", async (req, res) => {
       res.status(500).send(`Internal error : ${error}`);
     }
   });
+
+  //DELETE
 
   cartRouter.delete("/:cid", async (req, res) => {
     try {
