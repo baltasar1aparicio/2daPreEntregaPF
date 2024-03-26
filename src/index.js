@@ -1,5 +1,8 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
+import cookieParser from 'cookie-parser'
 import messageModel from './models/messages.js'
 import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
@@ -8,6 +11,7 @@ import Handlebars from 'handlebars';
 import { engine } from 'express-handlebars'
 import { __dirname } from './path.js'
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access'
+
 
 
 
@@ -89,6 +93,7 @@ console.log(resultado)
 //Middlewares
 
 app.use(express.json())
+app.use(cookieParser("claveSecreta"))
 app.engine('handlebars', engine({
     extname: '.handlebars',
     handlebars: allowInsecurePrototypeAccess(Handlebars),
@@ -100,10 +105,55 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 
+app.use(session({
+    secret: "balSecret",
+    resave: true,
+    store: MongoStore.create({
+        mongoUrl: "mongodb+srv://baltasar0017:shibuya2018@cluster0.kz1pjdm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+        ttl: 100,
+    }),
+    saveUninitialized: true
+}))
+
+app.post('/login', (req, res) => {
+    const {email, password} = req.body
+
+    if(email == "admin@admin.com" && password == "1234") {
+        req.session.email = email
+        req.session.password = password
+        return res.send("Login")
+    }
+    res.send("Login invalido")
+})
 
 //Routes
+
 app.use('/', indexRouter)
 
+//Cookies Routes
+
+app.set('/setCookies', (req, res) => {
+    res.cookie('cookieCookie', 'Esto es una cookie', {maxAge: 3000000, signed: true}).send(("Cookie creada"))
+})
+app.get('/getCookies', (req, res) => {
+    res.send(req.signedCookies)
+})
+app.get('/deleteCookie', (req, res) => {
+    res.clearCookie('cookieCookie').send("Cookie eliminadad")
+    //res.cookie('cookieCookie', '', {expires: new Date(0)})
+})
+
+//Sesion Routes
+
+app.get('/session', (req, res) => {
+    if(req.session.counter) {
+        req.session.counter++
+        res.send(`Sos el usuario n° ${req.session.counter}`)
+    } else {
+        req.session.counter = 1
+        res.send("Sos el primer usuario que ingresa a la pagina")
+    }
+})
 io.on('connection', (socket) => {
     console.log(`Conexion con Socket.io`)
 
