@@ -2,10 +2,12 @@ import express from 'express'
 import mongoose from 'mongoose'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
+import passport from 'passport'
 import cookieParser from 'cookie-parser'
 import messageModel from './models/messages.js'
 import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
+import initializePassport from './config/passport.js'
 import { Server } from 'socket.io'
 import Handlebars from 'handlebars';
 import { engine } from 'express-handlebars'
@@ -18,6 +20,7 @@ import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access
 //Configuraciones o declaraciones
 const app = express()
 const PORT = 9000
+
 
 
 //Server
@@ -105,6 +108,8 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 
+
+
 app.use(session({
     secret: "balSecret",
     resave: true,
@@ -114,6 +119,10 @@ app.use(session({
     }),
     saveUninitialized: true
 }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.post('/login', (req, res) => {
     const {email, password} = req.body
