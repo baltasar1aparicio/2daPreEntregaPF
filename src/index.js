@@ -8,6 +8,7 @@ import messageModel from './models/messages.js'
 import orderModel from './models/order.js'
 import indexRouter from './routes/index.routes.js'
 import initializePassport from './config/passport.js'
+import varenv from './dotenv.js'
 import { Server } from 'socket.io'
 import Handlebars from 'handlebars';
 import { engine } from 'express-handlebars'
@@ -31,7 +32,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server)
 
 //Connection DB
-mongoose.connect("mongodb+srv://baltasar0017:shibuya2018@cluster0.kz1pjdm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect(varenv.mongo_url)
     .then(() => console.log("DB is connected"))
     .catch(e => console.log(e))
 
@@ -96,7 +97,7 @@ console.log(resultado)
 //Middlewares
 
 app.use(express.json())
-app.use(cookieParser("claveSecreta"))
+app.use(cookieParser(varenv.cookies_secret))
 app.engine('handlebars', engine({
     extname: '.handlebars',
     handlebars: allowInsecurePrototypeAccess(Handlebars),
@@ -111,11 +112,11 @@ app.set('views', __dirname + '/views');
 
 
 app.use(session({
-    secret: "balSecret",
+    secret: varenv.session_secret,
     resave: true,
     store: MongoStore.create({
-        mongoUrl: "mongodb+srv://baltasar0017:shibuya2018@cluster0.kz1pjdm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-        ttl: 100,
+        mongoUrl: varenv.mongo_url,
+        ttl: 60 * 60
     }),
     saveUninitialized: true
 }))
